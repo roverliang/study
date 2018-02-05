@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>上传测试</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+</head>
+<body>
+<button id="browse" class="btn btn-primary" >选择文件</button>
+<button id="start_upload"  class="btn btn-success" >开始上传</button>
+<div class="containe">
+    <img src="" id="preview_img"   style="max-height: 500px" />
+</div>
+
+</body>
+<script src="./public/js/jquery-3.3.1.min.js"></script>
+<script src="./public/js/plupload/js/plupload.full.min.js"></script>
+
+<script>
+
+    var uploader = new plupload.Uploader({
+        browse_button : 'browse', //触发文件选择对话框的按钮，为那个元素id
+        url : 'upload.php', //服务器端的上传页面地址
+        flash_swf_url: './public/js/plupload/js//Moxie.swf', //flash文件地址
+        max_file_size: '1000mb',//限制为2MB
+        chunk_size:'1mb',
+        unique_names:true, //为每个文件生成一个临时名称
+        max_retries:3,
+        multipart_params:{
+        },//扩展参数
+        //filters: [{title: "image ",extensions: "jpg,gif,png"}],    //图片限制
+        //filters: [{title: "movie ",extensions: "mp4"}],            //电影限制
+        silverlight_xap_url : 'js/Moxie.xap' //silverlight文件，当需要使用silverlight方式进行上传时需要配置该参数
+    });
+
+    uploader.init();  //初始化uploader
+    uploader.start(); //开始上传
+    uploader.stop();  //暂停上传
+
+    $("#start_upload").click(function(){
+       uploader.start();
+    });
+
+
+
+    //文件添加的时候
+    uploader.bind('FilesAdded', function (uploader, files) {
+        /**
+         * 因此在这一步可以判断文件的上传个数，和文件的格式，以及上传文件的大小,以及进行图片预览的相关东东
+         */
+        console.log('-----当文件添加的时候打印 开始----');
+        for (i=0; i<files.length; i++ ) {
+            var tmp_file_size =  files[i]['size'] / 1024;
+            var tmp_msg = '添加文件的索引:'+ files[i]['id']+ "\t\t原始文件名:"+files[i]['name'] + "\t文件后缀:"+files[i]['type']+"\t文件的大小:"+tmp_file_size+"kb";
+            console.log(tmp_msg);
+        }
+        // 如果是图片的时候可以启用这部分
+//        mOxie.each(files, function(files) {
+//            var image = new mOxie.Image();
+//            image.onload = function() {
+//                var dataUrl = image.getAsDataURL();
+//                $("#preview_img").attr('src', dataUrl);
+//            };
+//
+//            image.load(files.getSource());
+//        });
+
+        console.log('-----当文件添加的时候打印 结束----');
+    });
+
+    //当上传队列中某一个文件开始上传后触发。
+    uploader.bind('BeforeUpload', function(uploader, file){
+        console.log('文件开始上传了');
+        //console.dir(file);
+    });
+
+    //当使用文件小片上传功能时，每一个小片上传完成后触发
+    uploader.bind('ChunkUploaded', function(uploader,file,responseObject){
+        console.log('-----当文件上传分片的时候打印 开始----');
+        //console.dir(JSON.parse(responseObject['response']));
+        console.log('-----当文件上传分片的时候打印 结束---');
+    });
+
+    //会在文件上传过程中不断触发，可以用此事件来显示上传进度
+    uploader.bind('UploadProgress', function(uploader,file) {
+        //console.log(uploader);
+        //console.log(file);
+    });
+
+    //当队列中的某一个文件上传完成后触发
+    uploader.bind('FileUploaded',function(uploader,files,data){
+        console.log('-----当文件上传完成的时候打印 开始----');
+        //console.dir(files);
+        console.dir(data);
+        console.log('-----当文件上传完成的时候打印 结束----');
+    });
+
+    //当上传队列中所有文件都上传完成后触发
+    uploader.bind('UploadComplete', function(uploader,files) {
+        console.log('所有的文件都已经上传完毕了');
+    });
+
+
+    //当上传发声错误时触发
+    uploader.bind('Error', function(uploader,errObj) {
+        console.log('-----当文件上传错误的时候打印 开始----');
+        console.dir(errObj);
+        console.log('-----当文件上传错误的时候打印 结束----');
+    });
+
+
+</script>
+</html>
